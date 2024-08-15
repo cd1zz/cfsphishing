@@ -926,12 +926,12 @@
                         "value": {
                             "office365": {
                                 "id": "[variables('office365ExternalId')]",
-                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365ConnectionName'))]",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('office365ConnectionName'))]",
                                 "connectionName": "[parameters('office365ConnectionName')]"
                             },
                             "securityCopilot": {
                                 "id": "[variables('securityCopilotExternalId')]",
-                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('securityCopilotConnectionName'))]",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters'securityCopilotConnectionName'))]",
                                 "connectionName": "[parameters('securityCopilotConnectionName')]"
                             }
                         }

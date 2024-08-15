@@ -931,7 +931,7 @@
                             },
                             "securityCopilot": {
                                 "id": "[variables('securityCopilotExternalId')]",
-                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters'securityCopilotConnectionName'))]",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('securityCopilotConnectionName'))]",
                                 "connectionName": "[parameters('securityCopilotConnectionName')]"
                             }
                         }

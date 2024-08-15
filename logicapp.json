@@ -1,21 +1,16 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "14183993404840833438"
-    }
-  },
   "parameters": {
+    "subscriptionId": {
+      "type": "string"
+    },
+    "resourceGroupName": {
+      "type": "string"
+    },
     "region": {
       "type": "string",
       "defaultValue": "eastus"
-    },
-    "logicAppName": {
-      "type": "string",
-      "defaultValue": "CopilotForSecurityPhishingAnalysisTemplate"
     },
     "office365ConnectionName": {
       "type": "string",
@@ -24,42 +19,9 @@
     "securityCopilotConnectionName": {
       "type": "string",
       "defaultValue": "securitycopilot-2"
-    },
-    "subscriptionId": {
-      "type": "string"
-    },
-    "resourceGroupName": {
-      "type": "string"
-    },
-    "functionAppName": {
-      "type": "string"
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.Web/connections",
-      "apiVersion": "2018-07-01-preview",
-      "name": "[parameters('office365ConnectionName')]",
-      "location": "[parameters('region')]",
-      "properties": {
-        "api": {
-          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/office365', parameters('subscriptionId'), parameters('region'))]"
-        },
-        "displayName": "Office 365"
-      }
-    },
-    {
-      "type": "Microsoft.Web/connections",
-      "apiVersion": "2018-07-01-preview",
-      "name": "[parameters('securityCopilotConnectionName')]",
-      "location": "[parameters('region')]",
-      "properties": {
-        "api": {
-          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/securitycopilot', parameters('subscriptionId'), parameters('region'))]"
-        },
-        "displayName": "Security Copilot"
-      }
-    },
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
@@ -931,14 +893,14 @@
           "$connections": {
             "value": {
               "office365-1": {
-                "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('office365ConnectionName'))]",
-                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('office365ConnectionName'))]",
-                "connectionName": "[parameters('office365ConnectionName')]"
+                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', parameters('subscriptionId'), parameters('resourceGroupName'), parameters('office365ConnectionName'))]",
+                "connectionName": "[parameters('office365ConnectionName')]",
+                "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/office365', parameters('subscriptionId'), parameters('region'))]"
               },
               "securitycopilot-1": {
-                "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('securityCopilotConnectionName'))]",
-                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('securityCopilotConnectionName'))]",
-                "connectionName": "[parameters('securityCopilotConnectionName')]"
+                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', parameters('subscriptionId'), parameters('resourceGroupName'), parameters('securityCopilotConnectionName'))]",
+                "connectionName": "[parameters('securityCopilotConnectionName')]",
+                "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/securitycopilot', parameters('subscriptionId'), parameters('region'))]"
               }
             }
           }

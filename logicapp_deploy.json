@@ -924,12 +924,12 @@
                 "parameters": {
                     "$connections": {
                         "value": {
-                            "[parameters('office365ConnectionName')]": {
+                            "office365": {
                                 "id": "[variables('office365ExternalId')]",
                                 "connectionId": "[variables('office365ExternalId')]",
                                 "connectionName": "[parameters('office365ConnectionName')]"
                             },
-                            "[parameters('securityCopilotConnectionName')]": {
+                            "securityCopilot": {
                                 "id": "[variables('securityCopilotExternalId')]",
                                 "connectionId": "[variables('securityCopilotExternalId')]",
                                 "connectionName": "[parameters('securityCopilotConnectionName')]"

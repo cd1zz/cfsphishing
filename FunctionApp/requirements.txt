@@ -1,0 +1,3 @@
+tldextract
+azure-functions
+beautifulsoup4

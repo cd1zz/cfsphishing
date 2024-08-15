@@ -310,12 +310,12 @@
                               },
                               "Compose_for_debugging_malicious_domain_true": {
                                 "runAfter": {
-                                  "ParseEmailVT-parse_virustotal_json": [
+                                  "[concat(parameters('functionAppName'), '-parse_virustotal_json')]": [
                                     "Succeeded"
                                   ]
                                 },
                                 "type": "Compose",
-                                "inputs": "@outputs('ParseEmailVT-parse_virustotal_json')"
+                                "inputs": "@outputs(concat(parameters('functionAppName'), '-parse_virustotal_json'))"
                               },
                               "Set_variable_last_analysis_results": {
                                 "runAfter": {
@@ -326,10 +326,10 @@
                                 "type": "SetVariable",
                                 "inputs": {
                                   "name": "last_analysis_results",
-                                  "value": "@{outputs('ParseEmailVT-parse_virustotal_json')}"
+                                  "value": "@{outputs(concat(parameters('functionAppName'), '-parse_virustotal_json'))"
                                 }
                               },
-                              "ParseEmailVT-parse_virustotal_json": {
+                              "[concat(parameters('functionAppName'), '-parse_virustotal_json')]": {
                                 "type": "Function",
                                 "inputs": {
                                   "body": "@body('Parse_JSON_from_VirusTotal')",
@@ -738,13 +738,13 @@
             },
             "Parse_JSON_from_functionapp": {
               "runAfter": {
-                "ParseEmailVT-parse_email": [
+                "[concat(parameters('functionAppName'), '-parse_email')]": [
                   "Succeeded"
                 ]
               },
               "type": "ParseJson",
               "inputs": {
-                "content": "@body('ParseEmailVT-parse_email')",
+                "content": "@body(concat(parameters('functionAppName'), '-parse_email'))",
                 "schema": {
                   "properties": {
                     "domains": {
@@ -904,7 +904,7 @@
                 "path": "/process-prompt"
               }
             },
-            "ParseEmailVT-parse_email": {
+            "[concat(parameters('functionAppName'), '-parse_email)]": {
               "runAfter": {
                 "For_each_attachment": [
                   "Succeeded"

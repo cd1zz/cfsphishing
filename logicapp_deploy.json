@@ -925,18 +925,19 @@
                     "$connections": {
                         "value": {
                             "office365": {
-                                "id": "[variables('office365ExternalId')]",
-                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('office365ConnectionName'))]",
+                                "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/office365')]",
+                                "connectionId": "[variables('office365ExternalId')]",
                                 "connectionName": "[parameters('office365ConnectionName')]"
                             },
                             "securityCopilot": {
-                                "id": "[variables('securityCopilotExternalId')]",
-                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('securityCopilotConnectionName'))]",
+                                "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/securitycopilot')]",
+                                "connectionId": "[variables('securityCopilotExternalId')]",
                                 "connectionName": "[parameters('securityCopilotConnectionName')]"
                             }
                         }
                     }
                 }
+
             }
         }
     ]

@@ -16,7 +16,7 @@
             }
         },
         "FunctionName": {
-            "defaultValue": "CopilotForSecurityPhishingAnalysis",
+            "defaultValue": "YourFunctionAppName",
             "type": "string"
         }
     },

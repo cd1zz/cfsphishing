@@ -19,3 +19,9 @@ Click the button below to deploy the Function App. You will be prompted to enter
   3. Select your account and after that the subscription of your Azure tenant.
   4. If you need to create a resource group, run: az group create --name "your-resource-group-name" --location "your-region"
   5. Deploy the logic app using the template file output from logicapp_prep.py. Command: az deployment group create --resource-group "your-resource-group-name" --template-file logicapp_deploy.json
+
+
+### Step 3: VirusTotal API Key
+
+Make sure you search for PLACEHOLDER to enter your VirusTotal API key in the logicapp.
+

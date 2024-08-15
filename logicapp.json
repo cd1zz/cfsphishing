@@ -931,13 +931,13 @@
           "$connections": {
             "value": {
               "office365-1": {
-                "id": "[resourceId('Microsoft.Web/connections', parameters('office365ConnectionName'))]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('office365ConnectionName'))]",
+                "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('office365ConnectionName'))]",
+                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('office365ConnectionName'))]",
                 "connectionName": "[parameters('office365ConnectionName')]"
               },
               "securitycopilot-1": {
-                "id": "[resourceId('Microsoft.Web/connections', parameters('securityCopilotConnectionName'))]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('securityCopilotConnectionName'))]",
+                "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('securityCopilotConnectionName'))]",
+                "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', subscription().subscriptionId, resourceGroup().name, parameters('securityCopilotConnectionName'))]",
                 "connectionName": "[parameters('securityCopilotConnectionName')]"
               }
             }

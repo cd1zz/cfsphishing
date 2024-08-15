@@ -19,6 +19,10 @@
     "securityCopilotConnectionName": {
       "type": "string",
       "defaultValue": "securitycopilot-2"
+    },
+    "logicAppName": {
+      "type": "string",
+      "defaultValue": "YourLogicAppName"
     }
   },
   "resources": [

@@ -89,7 +89,7 @@
                   "inputs": {
                     "host": {
                       "connection": {
-                        "name": "@parameters('$connections')['securitycopilot-1']['connectionId']"
+                        "name": "@parameters('$connections')['securitycopilot-2']['connectionId']"
                       }
                     },
                     "method": "post",
@@ -459,7 +459,7 @@
                   "inputs": {
                     "host": {
                       "connection": {
-                        "name": "@parameters('$connections')['securitycopilot-1']['connectionId']"
+                        "name": "@parameters('$connections')['securitycopilot-2']['connectionId']"
                       }
                     },
                     "method": "post",
@@ -517,7 +517,7 @@
                     "inputs": {
                       "host": {
                         "connection": {
-                          "name": "@parameters('$connections')['securitycopilot-1']['connectionId']"
+                          "name": "@parameters('$connections')['securitycopilot-2']['connectionId']"
                         }
                       },
                       "method": "post",
@@ -866,7 +866,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['securitycopilot-1']['connectionId']"
+                    "name": "@parameters('$connections')['securitycopilot-2']['connectionId']"
                   }
                 },
                 "method": "post",
@@ -901,7 +901,7 @@
                 "connectionName": "[parameters('office365ConnectionName')]",
                 "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/office365', parameters('subscriptionId'), parameters('region'))]"
               },
-              "securitycopilot-1": {
+              "securitycopilot-2": {
                 "connectionId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Web/connections/{2}', parameters('subscriptionId'), parameters('resourceGroupName'), parameters('securityCopilotConnectionName'))]",
                 "connectionName": "[parameters('securityCopilotConnectionName')]",
                 "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/securitycopilot', parameters('subscriptionId'), parameters('region'))]"

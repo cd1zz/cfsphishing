@@ -11,8 +11,10 @@ Click the button below to deploy the Function App. You will be prompted to enter
 
 ### Step 2: Deploy the Logic App
 
-run the logicapp_prep.py file to search and replace the default functionapp name with the name of the function app you just created in step one:
+Run the logicapp_prep.py file to search and replace the default functionapp name with the name of the function app you just created in step one:
   python logicapp_prep.py logicapp_original.json
+
+This is required because the ARM templates do not support dynamic JSON keys. 
 
 Click the button below to deploy the Logic App. You will be prompted to enter the resource group name, location, and Logic App name.
 

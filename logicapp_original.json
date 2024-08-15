@@ -21,13 +21,9 @@
       "defaultValue": "securitycopilot-2"
     },
     "logicAppName": {
-      "type": "string",
-      "defaultValue": "YourLogicAppName"
-    },
-    "functionAppName": {
-      "type": "string",
-      "defaultValue": "YourFunctionAppName"
+      "type": "string"
     }
+
   },
   "resources": [
     {
@@ -334,7 +330,7 @@
                                 "inputs": {
                                   "body": "@body('Parse_JSON_from_VirusTotal')",
                                   "function": {
-                                    "id": "[format('{0}/functions/parse_virustotal_json', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]"
+                                    "id": "[format('{0}/functions/parse_virustotal_json', resourceId('Microsoft.Web/sites/ParseEmailVT))]"
                                   }
                                 }
                               }
@@ -914,7 +910,7 @@
               "inputs": {
                 "body": "@variables('raw_email')",
                 "function": {
-                  "id": "[format('{0}/functions/parse_email', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]"
+                  "id": "[format('{0}/functions/parse_email', resourceId('Microsoft.Web/sites/ParseEmailVT'))]"
                 }
               }
             }

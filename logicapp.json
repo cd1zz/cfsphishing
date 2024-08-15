@@ -27,6 +27,30 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2021-06-01",
+      "name": "[parameters('office365ConnectionName')]",
+      "location": "[parameters('region')]",
+      "properties": {
+        "api": {
+          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/office365', subscription().subscriptionId, parameters('region'))]"
+        },
+        "displayName": "Office 365"
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2021-06-01",
+      "name": "[parameters('securityCopilotConnectionName')]",
+      "location": "[parameters('region')]",
+      "properties": {
+        "api": {
+          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/securitycopilot', subscription().subscriptionId, parameters('region'))]"
+        },
+        "displayName": "Security Copilot"
+      }
+    },
+    {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
       "name": "[parameters('logicAppName')]",

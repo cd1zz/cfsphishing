@@ -43,7 +43,7 @@
       "location": "[parameters('region')]",
       "properties": {
         "api": {
-          "id": "[resourceId('Microsoft.Web/locations', 'office365')]"
+          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/office365', parameters('subscriptionId'), parameters('region'))]"
         },
         "displayName": "Office 365"
       }
@@ -55,7 +55,7 @@
       "location": "[parameters('region')]",
       "properties": {
         "api": {
-          "id": "[resourceId('Microsoft.Web/locations', 'securitycopilot')]"
+          "id": "[format('/subscriptions/{0}/providers/Microsoft.Web/locations/{1}/managedApis/securitycopilot', parameters('subscriptionId'), parameters('region'))]"
         },
         "displayName": "Security Copilot"
       }

@@ -330,7 +330,7 @@
                                 "inputs": {
                                   "body": "@body('Parse_JSON_from_VirusTotal')",
                                   "function": {
-                                    "id": "[format('{0}/functions/parse_virustotal_json', resourceId('Microsoft.Web/sites/ParseEmailVT))]"
+                                    "id": "[format('{0}/functions/parse_virustotal_json', resourceId('Microsoft.Web/sites', 'ParseEmailVT'))]"
                                   }
                                 }
                               }
@@ -910,7 +910,7 @@
               "inputs": {
                 "body": "@variables('raw_email')",
                 "function": {
-                  "id": "[format('{0}/functions/parse_email', resourceId('Microsoft.Web/sites/ParseEmailVT'))]"
+                  "id": "[format('{0}/functions/parse_email', resourceId('Microsoft.Web/sites/sites', 'ParseEmailVT'))]"
                 }
               }
             }

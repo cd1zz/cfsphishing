@@ -23,6 +23,10 @@
     "logicAppName": {
       "type": "string",
       "defaultValue": "YourLogicAppName"
+    },
+    "functionAppName": {
+      "type": "string",
+      "defaultValue": "YourFunctionAppName"
     }
   },
   "resources": [

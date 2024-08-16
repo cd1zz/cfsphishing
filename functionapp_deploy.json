@@ -18,11 +18,16 @@
         "FunctionName": {
             "defaultValue": "YourFunctionAppName",
             "type": "string"
+        },
+        "StorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the storage account"
+            }
         }
     },
     "variables": {
-        "FunctionName": "[parameters('FunctionName')]",
-         "StorageAccountName": "[concat('cfs', uniqueString(resourceGroup().id))]"
+        "FunctionName": "[parameters('FunctionName')]"
     },
     "resources": [
         {
@@ -39,7 +44,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[variables('StorageAccountName')]",
+            "name": "[parameters('StorageAccountName')]",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS",
@@ -90,9 +95,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageAccountName'), '/default')]",
+            "name": "[concat(parameters('StorageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -110,9 +115,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageAccountName'), '/default')]",
+            "name": "[concat(parameters('StorageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -130,7 +135,7 @@
             "name": "[variables('FunctionName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('FunctionName'))]",
                 "[resourceId('Microsoft.Insights/components', variables('FunctionName'))]"
             ],
@@ -162,8 +167,8 @@
                         "FUNCTIONS_WORKER_RUNTIME": "python",
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.insights/components', variables('FunctionName')), '2020-02-02').InstrumentationKey]",
                         "APPLICATIONINSIGHTS_CONNECTION_STRING": "[reference(resourceId('microsoft.insights/components', variables('FunctionName')), '2020-02-02').ConnectionString]",
-                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', toLower(variables('StorageAccountName')),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(variables('StorageAccountName'))), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]",
-                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', toLower(variables('StorageAccountName')),';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(variables('StorageAccountName'))), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]",
+                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', toLower(parameters('StorageAccountName')),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(parameters('StorageAccountName'))), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]",
+                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', toLower(parameters('StorageAccountName')),';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(parameters('StorageAccountName'))), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]",
                         "WEBSITE_CONTENTSHARE": "[toLower(variables('FunctionName'))]",
                         "WEBSITE_RUN_FROM_PACKAGE": "https://github.com/cd1zz/cfsphishing/blob/main/FunctionApp.zip?raw=true"
                     } 
@@ -173,10 +178,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageAccountName'), '/default/azure-webjobs-hosts')]",
+            "name": "[concat(parameters('StorageAccountName'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('StorageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -185,10 +190,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageAccountName'), '/default/azure-webjobs-secrets')]",
+            "name": "[concat(parameters('StorageAccountName'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('StorageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -197,10 +202,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageAccountName'), '/default/', tolower(variables('StorageAccountName')))]",
+            "name": "[concat(parameters('StorageAccountName'), '/default/', tolower(parameters('StorageAccountName')))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('StorageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
                 "shareQuota": 5120

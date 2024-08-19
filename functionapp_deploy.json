@@ -10,7 +10,7 @@
         },
         "location": {
             "type": "string",
-            "defaultValue": "West US",
+            "defaultValue": "East US",
             "metadata": {
                 "description": "Location for all resources."
             }

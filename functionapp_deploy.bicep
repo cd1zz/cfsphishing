@@ -1,11 +1,11 @@
-param functionapp string
+param FunctionAppName string
 
 var subscriptionId = subscription().subscriptionId
 var resourceGroupName = resourceGroup().name
-var appserviceplan = '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/serverfarms/${functionapp}'
+var appserviceplan = '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/serverfarms/${FunctionAppName}'
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${functionapp}-appinsights'
+  name: '${FunctionAppName}-appinsights'
   location: resourceGroup().location
   kind: 'web'
   properties: {
@@ -14,7 +14,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource functionapp_resource 'Microsoft.Web/sites@2023-12-01' = {
-  name: functionapp
+  name: FunctionAppName
   location: resourceGroup().location
   tags: {
     'hidden-link: /app-insights-resource-id': appInsights.id
@@ -23,12 +23,12 @@ resource functionapp_resource 'Microsoft.Web/sites@2023-12-01' = {
     enabled: true
     hostNameSslStates: [
       {
-        name: '${functionapp}.azurewebsites.net'
+        name: '${FunctionAppName}.azurewebsites.net'
         sslState: 'Disabled'
         hostType: 'Standard'
       }
       {
-        name: '${functionapp}.scm.azurewebsites.net'
+        name: '${FunctionAppName}.scm.azurewebsites.net'
         sslState: 'Disabled'
         hostType: 'Repository'
       }
@@ -135,7 +135,7 @@ resource functionapp_web 'Microsoft.Web/sites/config@2023-12-01' = {
     acrUseManagedIdentityCreds: false
     logsDirectorySizeLimit: 35
     detailedErrorLoggingEnabled: false
-    publishingUsername: '$${functionapp}'
+    publishingUsername: '$${FunctionAppName}'
     scmType: 'None'
     use32BitWorkerProcess: false
     webSocketsEnabled: false
@@ -193,11 +193,11 @@ resource functionapp_parse_email 'Microsoft.Web/sites/functions@2023-12-01' = {
   name: 'parse_email'
   location: resourceGroup().location
   properties: {
-    script_root_path_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/'
-    script_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/__init__.py'
-    config_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/function.json'
-    test_data_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/tmp/FunctionsData/parse_email.dat'
-    href: 'https://${functionapp}.azurewebsites.net/admin/functions/parse_email'
+    script_root_path_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/'
+    script_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/__init__.py'
+    config_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/function.json'
+    test_data_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/tmp/FunctionsData/parse_email.dat'
+    href: 'https://${FunctionAppName}.azurewebsites.net/admin/functions/parse_email'
     config: {
       bindings: [
         {
@@ -216,7 +216,7 @@ resource functionapp_parse_email 'Microsoft.Web/sites/functions@2023-12-01' = {
         }
       ]
     }
-    invoke_url_template: 'https://${functionapp}.azurewebsites.net/api/parse_email'
+    invoke_url_template: 'https://${FunctionAppName}.azurewebsites.net/api/parse_email'
     language: 'python'
     isDisabled: false
   }
@@ -227,11 +227,11 @@ resource functionapp_parse_virustotal_json 'Microsoft.Web/sites/functions@2023-1
   name: 'parse_virustotal_json'
   location: resourceGroup().location
   properties: {
-    script_root_path_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/'
-    script_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/__init__.py'
-    config_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/function.json'
-    test_data_href: 'https://${functionapp}.azurewebsites.net/admin/vfs/tmp/FunctionsData/parse_virustotal_json.dat'
-    href: 'https://${functionapp}.azurewebsites.net/admin/functions/parse_virustotal_json'
+    script_root_path_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/'
+    script_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/__init__.py'
+    config_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/function.json'
+    test_data_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/tmp/FunctionsData/parse_virustotal_json.dat'
+    href: 'https://${FunctionAppName}.azurewebsites.net/admin/functions/parse_virustotal_json'
     config: {
       bindings: [
         {
@@ -252,7 +252,7 @@ resource functionapp_parse_virustotal_json 'Microsoft.Web/sites/functions@2023-1
       ]
       scriptFile: '__init__.py'
     }
-    invoke_url_template: 'https://${functionapp}.azurewebsites.net/api/parse_virustotal_json'
+    invoke_url_template: 'https://${FunctionAppName}.azurewebsites.net/api/parse_virustotal_json'
     language: 'python'
     isDisabled: false
   }
@@ -261,10 +261,10 @@ resource functionapp_parse_virustotal_json 'Microsoft.Web/sites/functions@2023-1
 
 resource functionapp_functionapp_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = {
   parent: functionapp_resource
-  name: '${functionapp}.azurewebsites.net'
+  name: '${FunctionAppName}.azurewebsites.net'
   location: resourceGroup().location
   properties: {
-    siteName: functionapp
+    siteName: FunctionAppName
     hostNameType: 'Verified'
   }
 }

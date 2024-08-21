@@ -2,7 +2,7 @@ param FunctionAppName string
 
 var subscriptionId = subscription().subscriptionId
 var resourceGroupName = resourceGroup().name
-var appserviceplan = '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/serverfarms/${FunctionAppName}'
+var serverFarmId = '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/serverfarms/${appServicePlan}'
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: '${FunctionAppName}-appinsights'
@@ -12,7 +12,18 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     Application_Type: 'web'
   }
 }
-
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+  name: '${FunctionAppName}-appServicePlan' 
+  location: resourceGroup().location
+  sku: {
+    name: 'Y1'  
+    tier: 'Dynamic'
+  }
+  kind: 'functionapp,linux'
+  properties: {
+    reserved: true  
+  }
+}
 resource functionapp_resource 'Microsoft.Web/sites@2023-12-01' = {
   name: FunctionAppName
   location: resourceGroup().location
@@ -33,7 +44,7 @@ resource functionapp_resource 'Microsoft.Web/sites@2023-12-01' = {
         hostType: 'Repository'
       }
     ]
-    serverFarmId: appserviceplan
+    serverFarmId: serverFarmId
     reserved: true
     isXenon: false
     hyperV: false
@@ -74,17 +85,17 @@ resource functionapp_resource 'Microsoft.Web/sites@2023-12-01' = {
     keyVaultReferenceIdentity: 'SystemAssigned'
   }
   dependsOn: [
-    appInsights  // Ensures Application Insights is created before this Function App
+    appInsights
+    appServicePlan 
   ]
 }
-
 
 resource functionapp_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2023-12-01' = {
   parent: functionapp_resource
   name: 'ftp'
   location: resourceGroup().location
   dependsOn: [
-    functionapp_resource  // Ensure this resource depends on the Function App being created first
+    functionapp_resource  
   ]
   tags: {
     'hidden-link: /app-insights-resource-id': appInsights.id
@@ -105,8 +116,6 @@ resource basicPublishingCredentialsPoliciesScm 'Microsoft.Web/sites/basicPublish
     allow: true
   }
 }
-
-
 
 resource functionapp_web 'Microsoft.Web/sites/config@2023-12-01' = {
   parent: functionapp_resource

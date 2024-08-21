@@ -5,7 +5,7 @@ If you want to change the function app code you can git clone the repo. Every ti
 
 ### Step 1: Deploy the Function App
 
-Click the button below to deploy the Function App. You will be prompted to enter the resource group name, location, and Function App name. Write the Function App name down, you will need it in the next step. 
+Click the button below to deploy the Function App. You will be prompted to select or create a resourceGroup, and provide a unique FunctionAppName. FunctionApp names must be unique to the world. 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcd1zz%2Fcfsphishing%2Fmain%2Ffunctionapp_deploy.json)
 

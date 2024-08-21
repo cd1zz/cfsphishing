@@ -12,44 +12,36 @@
     "resourceGroupName": {
       "type": "string"
     },
-    "sites_FunctionApp": {
+    "functionAppName": {
       "type": "string"
-    },
-    "location": {
-      "type": "string"
-    },
-    "appInsightsName": {
-      "type": "string",
-      "defaultValue": "[format('{0}-appInsights', parameters('sites_FunctionApp'))]"
-    },
-    "serverFarmName": {
-      "type": "string",
-      "defaultValue": "[format('{0}-plan', parameters('sites_FunctionApp'))]"
     }
   },
-  "variables": {
+"variables": {
     "subscriptionId": "[subscription().subscriptionId]",
-    "zipBlobUri": "https://github.com/cd1zz/cfsphishing/raw/main/FunctionApp.zip"
-  },
+    "zipBlobUri": "https://github.com/cd1zz/cfsphishing/raw/main/FunctionApp.zip",
+    "location": "[resourceGroup().location]",
+    "appInsightsName": "[format('{0}-appInsights', parameters('functionAppName'))]",
+    "serverFarmName": "[format('{0}-plan', parameters('functionAppName'))]"
+},
   "resources": [
     {
       "type": "Microsoft.Insights/components",
       "apiVersion": "2020-02-02",
-      "name": "[parameters('appInsightsName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('appInsightsName')]",
+      "location": "[variables('location')]",
       "kind": "web",
       "properties": {
         "Application_Type": "web"
       },
       "tags": {
-        "hidden-link: /app-insights-resource-id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/components/{2}', variables('subscriptionId'), parameters('resourceGroupName'), parameters('appInsightsName'))]"
+        "hidden-link: /app-insights-resource-id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/components/{2}', variables('subscriptionId'), parameters('resourceGroupName'), variables('appInsightsName'))]"
       }
     },
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2021-02-01",
-      "name": "[parameters('serverFarmName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('serverFarmName')]",
+      "location": "[variables('location')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
@@ -62,21 +54,21 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2023-12-01",
-      "name": "[parameters('sites_FunctionApp')]",
-      "location": "[parameters('location')]",
+      "name": "[parameters('functionAppName')]",
+      "location": "[variables('location')]",
       "identity": {
         "type": "SystemAssigned"
       },
       "properties": {
         "enabled": true,
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverFarmName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
         "siteConfig": {
           "numberOfWorkers": 1,
           "linuxFxVersion": "python|3.11",
           "appSettings": [
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), '2020-02-02').ConnectionString]"
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -87,49 +79,49 @@
         "httpsOnly": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
-        "[resourceId('Microsoft.Web/serverfarms', parameters('serverFarmName'))]"
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), 'ftp')]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'ftp')]",
       "properties": {
         "allow": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), 'scm')]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'scm')]",
       "properties": {
         "allow": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/config",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), 'web')]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'web')]",
       "properties": {
         "numberOfWorkers": 1,
         "linuxFxVersion": "python|3.11",
         "ftpsState": "FtpsOnly"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/functions",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), 'parse_email')]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'parse_email')]",
       "properties": {
         "config": {
           "bindings": [
@@ -152,13 +144,13 @@
         "isDisabled": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/functions",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), 'parse_virustotal_json')]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'parse_virustotal_json')]",
       "properties": {
         "config": {
           "bindings": [
@@ -182,19 +174,19 @@
         "isDisabled": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/hostNameBindings",
       "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('sites_FunctionApp'), format('{0}.azurewebsites.net', parameters('sites_FunctionApp')))]",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), format('{0}.azurewebsites.net', parameters('functionAppName')))]",
       "properties": {
-        "siteName": "[parameters('sites_FunctionApp')]",
+        "siteName": "[parameters('functionAppName')]",
         "hostNameType": "Verified"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_FunctionApp'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     }
   ]

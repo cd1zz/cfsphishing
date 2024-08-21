@@ -25,3 +25,5 @@ Click the button below to deploy the Function App. You will be prompted to enter
 
 Make sure you search for PLACEHOLDER to enter your VirusTotal API key in the logicapp.
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcd1zz%2Fcfsphishing%2Fmain%2Flogicapp_deploy.json)
+

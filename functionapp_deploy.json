@@ -9,9 +9,6 @@
     }
   },
   "parameters": {
-    "resourceGroupName": {
-      "type": "string"
-    },
     "functionAppName": {
       "type": "string"
     }
@@ -21,7 +18,8 @@
     "zipBlobUri": "https://github.com/cd1zz/cfsphishing/raw/main/FunctionApp.zip",
     "location": "[resourceGroup().location]",
     "appInsightsName": "[format('{0}-appInsights', parameters('functionAppName'))]",
-    "serverFarmName": "[format('{0}-plan', parameters('functionAppName'))]"
+    "serverFarmName": "[format('{0}-plan', parameters('functionAppName'))]",
+     "resourceGroupName": "[resourceGroup().name]"
 },
   "resources": [
     {
@@ -34,7 +32,7 @@
         "Application_Type": "web"
       },
       "tags": {
-        "hidden-link: /app-insights-resource-id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/components/{2}', variables('subscriptionId'), parameters('resourceGroupName'), variables('appInsightsName'))]"
+        "hidden-link: /app-insights-resource-id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/components/{2}', variables('subscriptionId'), variables('resourceGroupName'), variables('appInsightsName'))]"
       }
     },
     {

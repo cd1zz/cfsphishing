@@ -124,24 +124,6 @@ resource FunctionAppName_resource 'Microsoft.Web/sites@2023-12-01' = {
   }
 }
 
-resource FunctionAppName_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2023-12-01' = {
-  parent: FunctionAppName_resource
-  name: 'scm'
-  location: resourceGroup().location
-  dependsOn: [
-    applicationInsights
-  ]
-  tags: {
-    'hidden-link: /app-insights-resource-id': appInsightsResourceId
-    'hidden-link: /app-insights-instrumentation-key': appInsightsInstrumentationKey
-    'hidden-link: /app-insights-conn-string': appInsightsConnString
-   }
-
-  properties: {
-    allow: true
-  }
-}
-
 resource FunctionAppName_web 'Microsoft.Web/sites/config@2023-12-01' = {
   parent: FunctionAppName_resource
   name: 'web'

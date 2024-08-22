@@ -2,7 +2,7 @@
     "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion":  "1.0.0.0",
     "parameters":  {
-        "PlaybookName":  {
+        "LogicAppName":  {
             "defaultValue":  "PhishingAnalysisV3.1-VT",
             "type":  "string"
         },
@@ -26,8 +26,8 @@
         }
     },
     "variables":  {
-        "Office365-1ConnectionName":  "[concat('Office365-1-', parameters('PlaybookName'))]",
-        "Securitycopilot-1ConnectionName":  "[concat('Securitycopilot-1-', parameters('PlaybookName'))]"
+        "Office365-1ConnectionName":  "[concat('Office365-1-', parameters('LogicAppName'))]",
+        "Securitycopilot-1ConnectionName":  "[concat('Securitycopilot-1-', parameters('LogicAppName'))]"
     },
     "resources":  [
         {
@@ -918,7 +918,7 @@
                     }
                 }
             },
-            "name":  "[parameters('PlaybookName')]",
+            "name":  "[parameters('LogicAppName')]",
             "type":  "Microsoft.Logic/workflows",
             "location":  "[resourceGroup().location]",
             "tags":  {

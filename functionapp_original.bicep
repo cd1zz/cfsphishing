@@ -1,167 +1,151 @@
 param FunctionAppName string
-var StorageAccountName = '${uniqueString(resourceGroup().id)}-funcApp-storageAcct'
+param serverfarmid_appservice_plan string = '/subscriptions/ea2133ed-40f7-465c-ba33-07882efc8bd0/resourceGroups/copilot-for-security-demo/providers/Microsoft.Web/serverfarms/ParseEmailVT'
 
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${FunctionAppName}-appinsights'
-  location: resourceGroup().location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    ApplicationId: FunctionAppName
-  }
-}
-resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-  name: StorageAccountName
-  location: resourceGroup().location
-  sku: {
-    name: 'Standard_LRS'
-    tier: 'Standard'
-  }
-  kind: 'StorageV2'
-  properties: {
-    networkAcls: {
-      bypass: 'AzureServices'
-      virtualNetworkRules: []
-      ipRules: []
-      defaultAction: 'Allow'
-    }
-    supportsHttpsTrafficOnly: true
-    encryption: {
-      services: {
-        file: {
-          keyType: 'Account'
-          enabled: true
-        }
-        blob: {
-          keyType: 'Account'
-          enabled: true
-        }
-      }
-      keySource: 'Microsoft.Storage'
-    }
-  }
-}
+var serverfarm_FunctionAppName = '${FunctionAppName}-app-service-plan'
+var applicationInsightsName  = '${FunctionAppName}-app-insights'
+var resourceGroupName  = resourceGroup().name
+var subscriptionId  = subscription().subscriptionId
+var appInsightsResourceId = resourceId('Microsoft.Insights/components', applicationInsightsName)
+var appInsightsInstrumentationKey = applicationInsights.properties.InstrumentationKey
+var appInsightsConnString = applicationInsights.properties.ConnectionString
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2018-02-01' = {
-  name: '${FunctionAppName}-appServicePlan' 
+//App service plan
+resource serverfarms_appserviceplan 'Microsoft.Web/serverfarms@2018-02-01' = {
+  name: serverfarm_FunctionAppName
   location: resourceGroup().location
+  kind: 'functionapp,linux'
   sku: {
-    name: 'Y1'  
+    name: 'Y1'
     tier: 'Dynamic'
   }
-  kind: 'functionapp,linux'
   properties: {
     reserved: true
-    name: FunctionAppName
-    workerSize: 0
-    workerSizeId: 0
-    numberOfWorkers: 1
+    perSiteScaling: false
+    maximumElasticWorkerCount: 1
+    isXenon: false
+    hyperV: false
+  }
+  tags: {
+    displayName: 'App Service Plan for ${FunctionAppName}'
   }
 }
 
-resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2019-06-01' = {
-  parent: storageAccount
-  name: 'default'
+//App insights
+resource applicationInsights 'Microsoft.Insights/components@2015-05-01' = {
+  name: applicationInsightsName
+  location: resourceGroup().location
+  kind: 'web'
   dependsOn: [
-    storageAccount
+    serverfarms_appserviceplan
   ]
   properties: {
-    cors: {
-      corsRules: []
-    }
-    deleteRetentionPolicy: {
-      enabled: false
-    }
+    Application_Type: 'web'
+  }
+  tags: {
+    displayName: 'Application Insights for Function App'
   }
 }
 
-resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2019-06-01' = {
-  parent: storageAccount
-  name: 'default'
-  dependsOn: [
-    storageAccount
-  ]
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
-}
 
-resource functionapp_resource 'Microsoft.Web/sites@2018-02-01' = {
+resource FunctionAppName_resource 'Microsoft.Web/sites@2023-12-01' = {
   name: FunctionAppName
   location: resourceGroup().location
   dependsOn: [
-    storageAccount
-    appServicePlan
-    appInsights
+    applicationInsights
   ]
+  tags: {
+    'hidden-link: /app-insights-resource-id': appInsightsResourceId
+   }
   kind: 'functionapp,linux'
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    clientAffinityEnabled: true
-    alwaysOn: true
-    reserved: true
-    siteConfig: {
-      linuxFxVersion: 'python|3.9'
-    }
-  }
-  resource appSettings 'config' = {
-    name: 'appsettings'
-    dependsOn: [
-      functionapp_resource
+    enabled: true
+    hostNameSslStates: [
+      {
+        name: '${FunctionAppName}.azurewebsites.net'
+        sslState: 'Disabled'
+        hostType: 'Standard'
+      }
+      {
+        name: '${FunctionAppName}.scm.azurewebsites.net'
+        sslState: 'Disabled'
+        hostType: 'Repository'
+      }
     ]
-    properties: {
-      FUNCTIONS_EXTENSION_VERSION: '~4'
-      FUNCTIONS_WORKER_RUNTIME: 'python'
-      APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-      APPLICATIONINSIGHTS_CONNECTION_STRING: appInsights.properties.ConnectionString
-      AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${toLower(StorageAccountName)};AccountKey=${listKeys(storageAccount.id, \'2019-06-01\').keys[0].value};EndpointSuffix=core.windows.net'
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${toLower(StorageAccountName)};AccountKey=${listKeys(storageAccount.id, \'2019-06-01\').keys[0].value};EndpointSuffix=core.windows.net'
-      WEBSITE_CONTENTSHARE: toLower(FunctionName)
-      WEBSITE_RUN_FROM_PACKAGE: 'https://github.com/Yaniv-Shasha/SecurityCopilot/blob/main/Solutions/Userreportedphishingv2/parseemail.zip?raw=true'
+    serverFarmId: serverfarmid_appservice_plan
+    reserved: true
+    isXenon: false
+    hyperV: false
+    dnsConfiguration: {}
+    vnetRouteAllEnabled: false
+    vnetImagePullEnabled: false
+    vnetContentShareEnabled: false
+    siteConfig: {
+      numberOfWorkers: 1
+      linuxFxVersion: 'python|3.11'
+      appSettings: [
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsightsInstrumentationKey
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsightsConnString
+        }
+      ]
+      acrUseManagedIdentityCreds: false
+      alwaysOn: false
+      http20Enabled: false
+      FunctionAppNameScaleLimit: 200
+      minimumElasticInstanceCount: 0
     }
-  }
-}
-  
-resource functionapp_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2018-02-01' = {
-  parent: functionapp_resource
-  name: 'ftp'
-  location: resourceGroup().location
-  dependsOn: [
-    functionapp_resource  
-  ]
-  tags: {
-    'hidden-link: /app-insights-resource-id': appInsights.id
- }
-  properties: {
-    allow: true
+    scmSiteAlsoStopped: false
+    clientAffinityEnabled: false
+    clientCertEnabled: false
+    clientCertMode: 'Required'
+    hostNamesDisabled: false
+    vnetBackupRestoreEnabled: false
+    containerSize: 0
+    dailyMemoryTimeQuota: 0
+    httpsOnly: true
+    redundancyMode: 'None'
+    storageAccountRequired: false
+    keyVaultReferenceIdentity: 'SystemAssigned'
   }
 }
 
-resource basicPublishingCredentialsPoliciesScm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2018-02-01' = {
-  parent: functionapp_resource
+resource FunctionAppName_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2023-12-01' = {
+  parent: FunctionAppName_resource
   name: 'scm'
   location: resourceGroup().location
+  dependsOn: [
+    applicationInsights
+  ]
   tags: {
-    'hidden-link: /app-insights-resource-id': appInsights.id
-  }
+    'hidden-link: /app-insights-resource-id': appInsightsResourceId
+    'hidden-link: /app-insights-instrumentation-key': appInsightsInstrumentationKey
+    'hidden-link: /app-insights-conn-string': appInsightsConnString
+   }
+
   properties: {
     allow: true
   }
 }
 
-resource functionapp_web 'Microsoft.Web/sites/config@2018-02-01' = {
-  parent: functionapp_resource
+resource FunctionAppName_web 'Microsoft.Web/sites/config@2023-12-01' = {
+  parent: FunctionAppName_resource
   name: 'web'
   location: resourceGroup().location
+  dependsOn: [
+    applicationInsights
+  ]
   tags: {
-    'hidden-link: /app-insights-resource-id': appInsights.id
-  }
+    'hidden-link: /app-insights-resource-id': appInsightsResourceId
+    'hidden-link: /app-insights-instrumentation-key': appInsightsInstrumentationKey
+    'hidden-link: /app-insights-conn-string': appInsightsConnString
+   }
   properties: {
     numberOfWorkers: 1
     defaultDocuments: [
@@ -228,17 +212,20 @@ resource functionapp_web 'Microsoft.Web/sites/config@2018-02-01' = {
     scmMinTlsVersion: '1.2'
     ftpsState: 'FtpsOnly'
     preWarmedInstanceCount: 0
-    functionAppScaleLimit: 200
+    FunctionAppNameScaleLimit: 200
     functionsRuntimeScaleMonitoringEnabled: false
     minimumElasticInstanceCount: 0
     azureStorageAccounts: {}
   }
 }
 
-resource functionapp_parse_email 'Microsoft.Web/sites/functions@2018-02-01' = {
-  parent: functionapp_resource
+resource FunctionAppName_parse_email 'Microsoft.Web/sites/functions@2023-12-01' = {
+  parent: FunctionAppName_resource
   name: 'parse_email'
   location: resourceGroup().location
+  dependsOn: [
+    applicationInsights
+  ]
   properties: {
     script_root_path_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/'
     script_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_email/__init__.py'
@@ -269,10 +256,13 @@ resource functionapp_parse_email 'Microsoft.Web/sites/functions@2018-02-01' = {
   }
 }
 
-resource functionapp_parse_virustotal_json 'Microsoft.Web/sites/functions@2018-02-01' = {
-  parent: functionapp_resource
+resource FunctionAppName_parse_virustotal_json 'Microsoft.Web/sites/functions@2023-12-01' = {
+  parent: FunctionAppName_resource
   name: 'parse_virustotal_json'
   location: resourceGroup().location
+  dependsOn: [
+    applicationInsights
+  ]
   properties: {
     script_root_path_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/'
     script_href: 'https://${FunctionAppName}.azurewebsites.net/admin/vfs/home/site/wwwroot/parse_virustotal_json/__init__.py'
@@ -305,13 +295,15 @@ resource functionapp_parse_virustotal_json 'Microsoft.Web/sites/functions@2018-0
   }
 }
 
-
-resource functionapp_functionapp_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2018-02-01' = {
-  parent: functionapp_resource
+resource FunctionAppName_FunctionAppName_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = {
+  parent: FunctionAppName_resource
   name: '${FunctionAppName}.azurewebsites.net'
+  dependsOn: [
+    applicationInsights
+  ]
   location: resourceGroup().location
   properties: {
-    siteName: FunctionAppName
+    siteName: '${FunctionAppName}'
     hostNameType: 'Verified'
   }
 }

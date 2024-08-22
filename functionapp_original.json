@@ -5,38 +5,62 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "15797722429100578812"
+      "templateHash": "8728981842290109527"
     }
   },
   "parameters": {
     "FunctionAppName": {
       "type": "string"
+    },
+    "serverfarmid_appservice_plan": {
+      "type": "string",
+      "defaultValue": "/subscriptions/ea2133ed-40f7-465c-ba33-07882efc8bd0/resourceGroups/copilot-for-security-demo/providers/Microsoft.Web/serverfarms/ParseEmailVT"
     }
+  },
+  "variables": {
+    "serverfarm_FunctionAppName": "[format('{0}-app-service-plan', parameters('FunctionAppName'))]",
+    "applicationInsightsName": "[format('{0}-app-insights', parameters('FunctionAppName'))]",
+    "resourceGroupName": "[resourceGroup().name]",
+    "subscriptionId": "[subscription().subscriptionId]",
+    "appInsightsResourceId": "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
   },
   "resources": [
     {
-      "type": "Microsoft.Insights/components",
-      "apiVersion": "2020-02-02",
-      "name": "[format('{0}-appinsights', parameters('FunctionAppName'))]",
-      "location": "[resourceGroup().location]",
-      "kind": "web",
-      "properties": {
-        "Application_Type": "web"
-      }
-    },
-    {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2023-12-01",
-      "name": "[format('{0}-appServicePlan', parameters('FunctionAppName'))]",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('serverfarm_FunctionAppName')]",
       "location": "[resourceGroup().location]",
+      "kind": "functionapp,linux",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic"
       },
-      "kind": "functionapp,linux",
       "properties": {
-        "reserved": true
+        "reserved": true,
+        "perSiteScaling": false,
+        "maximumElasticWorkerCount": 1,
+        "isXenon": false,
+        "hyperV": false
+      },
+      "tags": {
+        "displayName": "[format('App Service Plan for {0}', parameters('FunctionAppName'))]"
       }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      },
+      "tags": {
+        "displayName": "Application Insights for Function App"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarm_FunctionAppName'))]"
+      ]
     },
     {
       "type": "Microsoft.Web/sites",
@@ -44,7 +68,11 @@
       "name": "[parameters('FunctionAppName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "hidden-link: /app-insights-resource-id": "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]"
+        "hidden-link: /app-insights-resource-id": "[variables('appInsightsResourceId')]"
+      },
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
       },
       "properties": {
         "enabled": true,
@@ -60,7 +88,7 @@
             "hostType": "Repository"
           }
         ],
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', format('{0}-appServicePlan', parameters('FunctionAppName')))]",
+        "serverFarmId": "[parameters('serverfarmid_appservice_plan')]",
         "reserved": true,
         "isXenon": false,
         "hyperV": false,
@@ -69,23 +97,23 @@
         "vnetImagePullEnabled": false,
         "vnetContentShareEnabled": false,
         "siteConfig": {
-          "linuxFxVersion": "python|3.11",
-          "functionAppScaleLimit": 200,
           "numberOfWorkers": 1,
-          "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
-          "http20Enabled": false,
-          "minimumElasticInstanceCount": 0,
+          "linuxFxVersion": "python|3.11",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName'))), '2020-02-02').InstrumentationKey]"
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "[format('InstrumentationKey={0};IngestionEndpoint=https://{1}-5.in.applicationinsights.azure.com/;LiveEndpoint=https://{2}.livediagnostics.monitor.azure.com/', reference(resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName'))), '2020-02-02').InstrumentationKey, resourceGroup().location, resourceGroup().location)]"
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
             }
-          ]
+          ],
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": false,
+          "http20Enabled": false,
+          "FunctionAppNameScaleLimit": 200,
+          "minimumElasticInstanceCount": 0
         },
         "scmSiteAlsoStopped": false,
         "clientAffinityEnabled": false,
@@ -101,24 +129,7 @@
         "keyVaultReferenceIdentity": "SystemAssigned"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]",
-        "[resourceId('Microsoft.Web/serverfarms', format('{0}-appServicePlan', parameters('FunctionAppName')))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-      "apiVersion": "2023-12-01",
-      "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'ftp')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "hidden-link: /app-insights-resource-id": "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]"
-      },
-      "properties": {
-        "allow": true
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]",
-        "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
       ]
     },
     {
@@ -127,13 +138,15 @@
       "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'scm')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "hidden-link: /app-insights-resource-id": "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]"
+        "hidden-link: /app-insights-resource-id": "[variables('appInsightsResourceId')]",
+        "hidden-link: /app-insights-instrumentation-key": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]",
+        "hidden-link: /app-insights-conn-string": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
       },
       "properties": {
         "allow": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
       ]
     },
@@ -143,7 +156,9 @@
       "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'web')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "hidden-link: /app-insights-resource-id": "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]"
+        "hidden-link: /app-insights-resource-id": "[variables('appInsightsResourceId')]",
+        "hidden-link: /app-insights-instrumentation-key": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]",
+        "hidden-link: /app-insights-conn-string": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
       },
       "properties": {
         "numberOfWorkers": 1,
@@ -211,13 +226,13 @@
         "scmMinTlsVersion": "1.2",
         "ftpsState": "FtpsOnly",
         "preWarmedInstanceCount": 0,
-        "functionAppScaleLimit": 200,
+        "FunctionAppNameScaleLimit": 200,
         "functionsRuntimeScaleMonitoringEnabled": false,
         "minimumElasticInstanceCount": 0,
         "azureStorageAccounts": {}
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components', format('{0}-appinsights', parameters('FunctionAppName')))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
       ]
     },
@@ -255,6 +270,7 @@
         "isDisabled": false
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
       ]
     },
@@ -294,6 +310,7 @@
         "isDisabled": false
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
       ]
     },
@@ -303,10 +320,11 @@
       "name": "[format('{0}/{1}', parameters('FunctionAppName'), format('{0}.azurewebsites.net', parameters('FunctionAppName')))]",
       "location": "[resourceGroup().location]",
       "properties": {
-        "siteName": "[parameters('FunctionAppName')]",
+        "siteName": "[format('{0}', parameters('FunctionAppName'))]",
         "hostNameType": "Verified"
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
       ]
     }

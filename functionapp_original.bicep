@@ -1,5 +1,4 @@
 param FunctionAppName string
-param serverfarmid_appservice_plan string = '/subscriptions/ea2133ed-40f7-465c-ba33-07882efc8bd0/resourceGroups/copilot-for-security-demo/providers/Microsoft.Web/serverfarms/ParseEmailVT'
 
 var serverfarm_FunctionAppName = '${FunctionAppName}-app-service-plan'
 var applicationInsightsName  = '${FunctionAppName}-app-insights'
@@ -8,6 +7,7 @@ var subscriptionId  = subscription().subscriptionId
 var appInsightsResourceId = resourceId('Microsoft.Insights/components', applicationInsightsName)
 var appInsightsInstrumentationKey = applicationInsights.properties.InstrumentationKey
 var appInsightsConnString = applicationInsights.properties.ConnectionString
+var serverfarmid_appservice_plan = '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/serverfarms/${FunctionAppName}'
 
 //App service plan
 resource serverfarms_appserviceplan 'Microsoft.Web/serverfarms@2018-02-01' = {

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "8728981842290109527"
+      "templateHash": "3641821932010491319"
     }
   },
   "parameters": {
@@ -107,6 +107,14 @@
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(parameters('FunctionAppName'))]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "https://github.com/cd1zz/cfsphishing/blob/main/FunctionApp.zip?raw=true"
             }
           ],
           "acrUseManagedIdentityCreds": false,

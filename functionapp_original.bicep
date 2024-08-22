@@ -94,6 +94,14 @@ resource FunctionAppName_resource 'Microsoft.Web/sites@2023-12-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsightsConnString
         }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: toLower(FunctionAppName)
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE' 
+          value: 'https://github.com/cd1zz/cfsphishing/blob/main/FunctionApp.zip?raw=true'
+        }
       ]
       acrUseManagedIdentityCreds: false
       alwaysOn: false

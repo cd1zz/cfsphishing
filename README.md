@@ -16,4 +16,12 @@ Click the button below to deploy the Logic App.
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcd1zz%2Fcfsphishing%2Fmain%2Flogicapp_azuredeploy.json)
 
 
+### Step 3: Initialize O365 and Security Copilot API connections
 
+Open your new Logic App.
+
+Click "API Connections"
+![alt text](image.png)
+
+Authorize both of the API connections.
+![alt text](image-1.png)

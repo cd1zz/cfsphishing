@@ -7,7 +7,7 @@ If you want to change the function app code you can git clone the repo. Every ti
 
 Click the button below to deploy the Function App. You will be prompted to select or create a resourceGroup, and provide a unique FunctionAppName. FunctionApp names must be unique to the world. 
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcd1zz%2Fcfsphishing%2Fmain%2Ffunctionapp_deploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcd1zz%2Fcfsphishing%2Fmain%2Ffunctionapp_original.json)
 
 ### Step 2: Deploy the Logic App
 

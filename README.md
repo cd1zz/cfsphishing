@@ -1,3 +1,6 @@
+# User Submitted Phishing Analysis with Copilot for Security
+This solution demonstrates how Copilot for Security can be used to automate the analysis of user submitted phishing emails. The solution monitors a shared inbox for new emails. When emails are received, the Logic App triggers and begins processing. The process includes a Function App to parse the relevant parts of the email and passes those to VirusTotal and Copilot for Security.
+
 ## Notes
 If you want to change the function app code you can git clone the repo. Every time you change the FunctionApp code, be sure to repackage the FunctionApp.zip file. The zip file is what is referenced when the solution is deployed. The local .python_packages folder is necessary when deploying in this "push to deploy" manner. 
 
@@ -28,4 +31,4 @@ Authorize both of the API connections.
 ![alt text](image-1.png)
 
 ### Step 4: Enable the Logic App
-![alt text](image-2.png)
+![alt text](image-3.png)

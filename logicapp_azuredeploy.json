@@ -920,8 +920,7 @@
             "apiVersion":  "2017-07-01",
             "dependsOn":  [
                 "[resourceId('Microsoft.Web/connections', variables('Office365-1ConnectionName'))]",
-                "[resourceId('Microsoft.Web/connections', variables('Securitycopilot-1ConnectionName'))]",
-                "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
+                "[resourceId('Microsoft.Web/connections', variables('Securitycopilot-1ConnectionName'))]"
 
             ]
         },

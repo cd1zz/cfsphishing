@@ -921,7 +921,7 @@
             "dependsOn":  [
                 "[resourceId('Microsoft.Web/connections', variables('Office365-1ConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('Securitycopilot-1ConnectionName'))]",
-                "[concat('Microsoft.Web/sites/', parameters('FunctionAppName'), '/functions/', variables('FunctionName01'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
 
             ]
         },

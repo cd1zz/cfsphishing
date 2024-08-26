@@ -283,7 +283,7 @@
                                                                 "inputs":  {
                                                                     "body":  "@body('Parse_JSON_from_VirusTotal')",
                                                                     "function":  {
-                                                                        "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('FunctionAppRG'), '/providers/Microsoft.Web/sites/', parameters('FunctionAppName'), '/functions/', variables('FunctionName01'))]"
+                                                                        "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('FunctionAppRG'), '/providers/Microsoft.Web/sites/', parameters('FunctionAppName'), '/functions/', variables('FunctionName02'))]"
                                                                     }
                                                                 }
                                                             },
@@ -719,7 +719,7 @@
                             "inputs":  {
                                 "body":  "@{variables('raw_email')}",
                                 "function":  {
-                                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('FunctionAppRG'), '/providers/Microsoft.Web/sites/', parameters('FunctionAppName'), '/functions/', variables('FunctionName02'))]"
+                                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('FunctionAppRG'), '/providers/Microsoft.Web/sites/', parameters('FunctionAppName'), '/functions/', variables('FunctionName01'))]"
                                 }
                             }
                         },

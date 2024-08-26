@@ -6,7 +6,7 @@
             "defaultValue":  "PhishingAnalysisV3.1-VT",
             "type":  "string"
         },
-            "FunctionAppRG":  {            
+        "FunctionAppRG":  {            
             "type":  "string"
         },
         "FunctionAppName":  {            

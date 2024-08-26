@@ -25,3 +25,6 @@ Click "API Connections"
 
 Authorize both of the API connections.
 ![alt text](image-1.png)
+
+### Step 4: Enable the Logic App
+![alt text](image-2.png)
